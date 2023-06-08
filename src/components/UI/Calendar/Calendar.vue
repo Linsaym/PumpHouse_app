@@ -11,7 +11,10 @@
     </div>
     <div class="calendar__changeTariff">
       <!--      <input class="changeTariff__input" v-model="tariffOnSelectedMonth"/>-->
-      <span contenteditable="true" class="changeTariff__input">{{ tariffOnSelectedMonth }}</span>
+      <span contenteditable="true" class="changeTariff__input" @focusout="changeTariff">{{
+          tariffOnSelectedMonth
+        }}
+      </span>
     </div>
 
   </div>
@@ -30,17 +33,25 @@ export default {
   data() {
     return {
       selectedYear: 2023,
-      selectedMonth: 1,
+      selectedMonth: 0,
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-      tariffs: [123, 231, 142, 42, 65, 87, 34, 65, 87, 56, 44, 65],
-      tariffOnSelectedMonth: 1,
+      tariffs: [89, 231, 142, 42, 65, 87, 34, 65, 87, 56, 44, 65],
+      tariffOnSelectedMonth: 0,
     }
   },
   methods: {
     changeSelectedMonth(selectedMonthIndex) {
       this.selectedMonth = selectedMonthIndex
-      console.log(this.months[this.selectedMonth])
+      this.tariffOnSelectedMonth = this.tariffs[this.selectedMonth]
+    },
+    changeTariff(event) {
+      const newTariff = event.target.innerText
+      this.tariffOnSelectedMonth = newTariff
+      this.tariffs[this.selectedMonth] = newTariff
     }
+  },
+  mounted() {
+    this.tariffOnSelectedMonth = this.tariffs[this.selectedMonth]
   }
 }
 </script>

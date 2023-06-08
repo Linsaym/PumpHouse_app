@@ -11,7 +11,7 @@ export default {
     month: String,
     monthIndex: Number,
     isSelected: Boolean,
-    tariff: Number,
+    tariff: Number | String,
   },
   // data() {
   //   return {

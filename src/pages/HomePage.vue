@@ -2,12 +2,14 @@
 
 import ResidentsList from "@/components/UI/ResidentsList.vue";
 import Calendar from "@/components/UI/Calendar/Calendar.vue";
+import Modal from "@/components/UI/Modal/Modal.vue";
 </script>
 
 <template>
   <div class="wrapper homePage">
     <ResidentsList/>
     <Calendar/>
+    <Modal/>
   </div>
 </template>
 
