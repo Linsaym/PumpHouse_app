@@ -6,11 +6,12 @@
     </div>
     <div class="calendar__main">
       <CalendarMonth v-for="(month,i) in months" :key="month" :month="month" :isSelected="i==selectedMonth"
-                     :tariff="tariffs[i]"/>
+                     :monthIndex="i"
+                     :tariff="tariffs[i]" @changeSelectedMonth="changeSelectedMonth"/>
     </div>
     <div class="calendar__changeTariff">
       <!--      <input class="changeTariff__input" v-model="tariffOnSelectedMonth"/>-->
-      <span contenteditable="true" class="changeTariff__input">123</span>
+      <span contenteditable="true" class="changeTariff__input">{{ tariffOnSelectedMonth }}</span>
     </div>
 
   </div>
@@ -32,7 +33,13 @@ export default {
       selectedMonth: 1,
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       tariffs: [123, 231, 142, 42, 65, 87, 34, 65, 87, 56, 44, 65],
-      tariffOnSelectedMonth: 0,
+      tariffOnSelectedMonth: 1,
+    }
+  },
+  methods: {
+    changeSelectedMonth(selectedMonthIndex) {
+      this.selectedMonth = selectedMonthIndex
+      console.log(this.months[this.selectedMonth])
     }
   }
 }

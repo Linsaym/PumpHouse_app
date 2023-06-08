@@ -1,5 +1,6 @@
 <template>
-  <div @click="chooseMonth" class="calendar__month-block" :class="{'month-block--selected':isSelected}">
+  <div @click="$emit('changeSelectedMonth',monthIndex)" class="calendar__month-block"
+       :class="{'month-block--selected':isSelected}">
     <div class="calendar__month-name">{{ month }}</div>
     <div class="month__tariff">{{ tariff }}</div>
   </div>
@@ -8,6 +9,7 @@
 export default {
   props: {
     month: String,
+    monthIndex: Number,
     isSelected: Boolean,
     tariff: Number,
   },
