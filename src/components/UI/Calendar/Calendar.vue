@@ -2,7 +2,7 @@
   <div class="calendar">
     <div class="calendar__header">Редактирование тарифа за месяц</div>
     <div class="calendar__year">
-      <YearSlider/>
+      <YearSlider @changeSelectedYear="changeSelectedYear"/>
     </div>
     <div class="calendar__main">
       <CalendarMonth v-for="(month,i) in months" :key="month" :month="month" :isSelected="i==selectedMonth"
@@ -43,11 +43,19 @@ export default {
     changeSelectedMonth(selectedMonthIndex) {
       this.selectedMonth = selectedMonthIndex
       this.tariffOnSelectedMonth = this.tariffs[this.selectedMonth]
+      this.changeSelectedDate()
     },
     changeTariff(event) {
       const newTariff = event.target.innerText
       this.tariffOnSelectedMonth = newTariff
       this.tariffs[this.selectedMonth] = newTariff
+    },
+    changeSelectedYear(year) {
+      this.selectedYear = year
+      this.changeSelectedDate()
+    },
+    changeSelectedDate() {
+      this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
     }
   },
   mounted() {

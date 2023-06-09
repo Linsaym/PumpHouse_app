@@ -1,13 +1,13 @@
 <template>
   <div class="slider">
-    <div @click="()=>{year-=1}" class="arrow-left">←</div>
+    <div @click="prevYear" class="arrow-left">←</div>
     <div class="years">
-      <span @click="()=>{year-=1}" class="prevYear">{{ year - 1 }}</span>
+      <span @click="prevYear" class="prevYear">{{ year - 1 }}</span>
       <span class="year">{{ year }}</span>
-      <span @click="()=>{year+=1}" class="nextYear">{{ year + 1 }}</span>
+      <span @click="nextYear" class="nextYear">{{ year + 1 }}</span>
     </div>
 
-    <div @click="()=>{year+=1}" class="arrow-right">→</div>
+    <div @click="nextYear" class="arrow-right">→</div>
   </div>
 </template>
 
@@ -19,6 +19,16 @@ export default {
   data() {
     return {
       year: 2023,
+    }
+  },
+  methods: {
+    prevYear() {
+      this.year -= 1
+      this.$emit('changeSelectedYear', this.year)
+    },
+    nextYear() {
+      this.year += 1
+      this.$emit('changeSelectedYear', this.year)
     }
   }
 };
