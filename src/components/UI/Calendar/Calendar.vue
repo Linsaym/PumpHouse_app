@@ -33,7 +33,7 @@ export default {
   data() {
     return {
       selectedYear: 2023,
-      selectedMonth: 0,
+      selectedMonth: null,
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       tariffs: [89, 231, 142, 42, 65, 87, 34, 65, 87, 56, 44, 65],
       tariffOnSelectedMonth: 0,

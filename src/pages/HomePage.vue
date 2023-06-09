@@ -32,8 +32,12 @@ export default {
       this.closeModal()
       this.residents.push({fio: fio, area: area, start_date: start_date})
     },
-    changeSelectedDate() {
-
+    changeSelectedDate(year, month) {
+      this.selectedDate = new Date(year, month + 1)
+      this.residents = Residents.filter((resident) => {
+        const residentRegDate = new Date(resident.start_date)
+        return residentRegDate.getTime() <= this.selectedDate.getTime()
+      })
     }
   }
 }

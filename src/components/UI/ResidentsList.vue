@@ -25,7 +25,7 @@ export default {
     residents: {
       type: Array,
     },
-    year: {
+    dateForFilter: {
       type: Date,
     }
   },
@@ -34,6 +34,7 @@ export default {
       tariff: 98,
       areaSum: 0,
       revenue: 0,
+
     }
   },
   mounted() {

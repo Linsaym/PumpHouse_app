@@ -6,7 +6,6 @@
       <span class="year">{{ year }}</span>
       <span @click="nextYear" class="nextYear">{{ year + 1 }}</span>
     </div>
-
     <div @click="nextYear" class="arrow-right">→</div>
   </div>
 </template>
