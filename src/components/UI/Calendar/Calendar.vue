@@ -2,20 +2,32 @@
   <div class="calendar">
     <div class="calendar__header">Редактирование тарифа за месяц</div>
     <div class="calendar__year">
-      <YearSlider @changeSelectedYear="changeSelectedYear"/>
+      <YearSlider @changeSelectedYear="changeSelectedYear" :selectedYear="selectedYear" :active="selectedMonth!=null"/>
     </div>
     <div class="calendar__main">
-      <CalendarMonth v-for="(month,i) in months" :key="month" :month="month" :isSelected="i==selectedMonth"
+      <CalendarMonth v-for="(month,i) in months" :key="indicationsAndTariffs[i].indications + month" :month="month"
+                     :isSelected="i==selectedMonth"
                      :monthIndex="i"
-                     :tariff="tariffs[i]" @changeSelectedMonth="changeSelectedMonth"/>
+                     :indicationsAndTariff="indicationsAndTariffs[i]"
+                     @changeSelectedMonth="changeSelectedMonth"
+                     @changeInputOnIndications="changeInputOnIndications"
+                     @changeInputOnTariff="changeInputOnTariff"
+      />
     </div>
-    <div class="calendar__changeTariff">
-      <!--      <input class="changeTariff__input" v-model="tariffOnSelectedMonth"/>-->
+    <div v-if="inputType=='Tariff'" class="calendar__changeTariff">
       <span contenteditable="true" class="changeTariff__input" @focusout="changeTariff">{{
           tariffOnSelectedMonth
         }}
       </span>
     </div>
+    <div v-if="inputType=='Indications'" class="calendar__changeIndications">
+      <span contenteditable="true" class="changeIndications__input"
+            @focusout="changeIndications">{{
+          IndicationsOnSelectedMonth
+        }}
+      </span>
+    </div>
+    <div v-if="inputType==''" class="calendar__footer"></div>
 
   </div>
 </template>
@@ -23,6 +35,7 @@
 <script>
 import CalendarMonth from "@/components/UI/Calendar/CalendarMonth.vue"
 import YearSlider from "@/components/UI/Calendar/YearSlider.vue";
+import IndicationsAndTariffs from "@/data_for_tests/Indications";
 
 export default {
   name: "Calendar",
@@ -32,38 +45,73 @@ export default {
   },
   data() {
     return {
+      inputType: '',
       selectedYear: 2023,
       selectedMonth: null,
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-      tariffs: [89, 231, 142, 42, 65, 87, 34, 65, 87, 56, 44, 65],
+      indicationsAndTariffs: IndicationsAndTariffs[2023],
+      AllYears: IndicationsAndTariffs,
       tariffOnSelectedMonth: 0,
+      IndicationsOnSelectedMonth: 0,
     }
   },
   methods: {
+    changeInputOnTariff() {
+      this.inputType = 'Tariff'
+    },
+    changeInputOnIndications() {
+      this.inputType = 'Indications'
+    },
     changeSelectedMonth(selectedMonthIndex) {
       this.selectedMonth = selectedMonthIndex
-      this.tariffOnSelectedMonth = this.tariffs[this.selectedMonth]
+      this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].tariff
+      this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].indications
       this.changeSelectedDate()
     },
     changeTariff(event) {
-      const newTariff = event.target.innerText
+      const newTariff = event.target.innerText.substring(0, 5)
       this.tariffOnSelectedMonth = newTariff
-      this.tariffs[this.selectedMonth] = newTariff
+      this.indicationsAndTariffs[this.selectedMonth].tariff = newTariff
+    },
+    changeIndications(event) {
+      const newIndications = event.target.innerText.substring(0, 6)
+      this.IndicationsOnSelectedMonth = newIndications
+      this.indications[this.selectedMonth] = newIndications
     },
     changeSelectedYear(year) {
-      this.selectedYear = year
-      this.changeSelectedDate()
+      if (this.selectedMonth == null) {
+        alert('Пожалуйста сначала выберите месяц')
+      } else {
+        this.selectedYear = year
+        this.changeSelectedDate()
+      }
     },
     changeSelectedDate() {
-      this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
+      this.indicationsAndTariffs = this.AllYears[this.selectedYear]
+      //Если мы находимся на первом месяце, значит, чтобы посчитать разницу счётчиков, нужно взять текущую дату и отнять от неё показания на последнем дне предыдущего года
+      let waterSpent
+      try {
+        waterSpent = this.selectedMonth == 0 ?
+            this.IndicationsOnSelectedMonth - this.AllYears[this.selectedYear - 1][11].indications
+            : this.IndicationsOnSelectedMonth - this.indicationsAndTariffs[this.selectedMonth - 1].indications
+      } catch (err) {
+        alert('Данные о датах ранее 2021 года ещё не занесены, это тестовая версия приложения. Перезагрузите страницу, чтобы продолжить работу')
+        waterSpent = 0
+      }
+      this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
     }
   },
-  mounted() {
-    this.tariffOnSelectedMonth = this.tariffs[this.selectedMonth]
-  }
 }
 </script>
 <style>
+.calendar__footer {
+  border-radius: 0px 0px 20px 20px;
+  width: 360px;
+  height: 48px;
+  background: #49454F;
+
+}
+
 .calendar__header {
   border-radius: 20px 20px 0px 0px;
   width: 360px;
@@ -89,7 +137,7 @@ export default {
   line-height: 44px;
 }
 
-.changeTariff__input {
+.changeTariff__input, .changeIndications__input {
   display: block;
   margin-top: -2px;
   width: 360px;
@@ -113,6 +161,10 @@ export default {
   content: " ₽";
 }
 
+.changeIndications__input::after {
+  content: " м³";
+}
+
 .calendar__main > *:last-child {
   padding-bottom: 10px;
 }
@@ -121,22 +173,28 @@ export default {
   outline: none !important;
 }
 
-.calendar__changeTariff {
+.calendar__changeTariff, .calendar__changeIndications {
   position: relative;
 }
 
-.calendar__changeTariff::before {
+.calendar__changeTariff::before, .calendar__changeIndications::before {
   position: absolute;
   top: 3px;
   left: 32px;
-  content: "Цена за 1м³ воды за выбранный месяц (в рублях)";
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
   color: #CAC4D0;
+}
 
+.calendar__changeIndications::before {
+  content: "Показания счётчика в м³ на выбранный месяц";
+}
+
+.calendar__changeTariff::before {
+  content: "Цена за 1м³ воды за выбранный месяц (в рублях)";
 }
 
 </style>

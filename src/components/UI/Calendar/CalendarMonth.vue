@@ -2,7 +2,8 @@
   <div @click="$emit('changeSelectedMonth',monthIndex)" class="calendar__month-block"
        :class="{'month-block--selected':isSelected}">
     <div class="calendar__month-name">{{ month }}</div>
-    <div class="month__tariff">{{ tariff }}</div>
+    <div @click="$emit('changeInputOnIndications',monthIndex)" class="month__indications">{{ indications }}м³</div>
+    <div @click="$emit('changeInputOnTariff',monthIndex)" class="month__tariff">{{ tariff }}₽</div>
   </div>
 </template>
 <script>
@@ -11,13 +12,14 @@ export default {
     month: String,
     monthIndex: Number,
     isSelected: Boolean,
-    tariff: Number | String,
+    indicationsAndTariff: Object,
   },
-  // data() {
-  //   return {
-  //     isSelected: false,
-  //   }
-  // }
+  data() {
+    return {
+      indications: this.indicationsAndTariff.indications,
+      tariff: this.indicationsAndTariff.tariff,
+    }
+  }
 }
 </script>
 <style>
@@ -26,12 +28,12 @@ export default {
   background: #1D1B20;
   height: 42px;
   display: grid;
-  grid-template-columns: 200px 100px;
+  grid-template-columns: 70px 130px 90px;
   align-items: center;
-  padding-left: 52px;
+  padding-left: 42px;
 }
 
-.month__tariff {
+.month__tariff, .month__indications {
   text-align: center;
   width: 70px;
   height: 21px;
@@ -39,8 +41,9 @@ export default {
   border-radius: 11px;
 }
 
-.month__tariff::after {
-  content: "₽";
+.month__indications {
+  margin-left: 22px;
+  width: 90px;
 }
 
 .month-block--selected {

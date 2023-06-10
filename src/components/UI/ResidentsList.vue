@@ -4,12 +4,14 @@
       <button @click="$emit('openModal')" class="resident__label" style="width: 250px">Добавить пользователя +</button>
       <button class="resident__label">Площадь участков</button>
       <button class="resident__label">Дата регистрации</button>
+      <button class="resident__label">Сумма платежа</button>
     </div>
     <div class="residentsList">
       <Resident :resident="resident" v-for="resident in residents"/>
     </div>
     <div class="residentsList__footer">
       <span>Общая площадь: {{ areaSum }} м²</span>
+      <span>Количество пользователей: {{ residents.length }}</span>
       <span>Выручка: {{ revenue }} рублей</span>
     </div>
   </div>
@@ -27,6 +29,9 @@ export default {
     },
     dateForFilter: {
       type: Date,
+    },
+    Indications: {
+      type: Number,
     }
   },
   data() {
@@ -42,7 +47,7 @@ export default {
         this.residents.reduce((previousValue, currentValue) => {
           return {area: parseInt(previousValue.area) + parseInt(currentValue.area)}
         }).area
-    this.revenue = this.tariff * this.areaSum
+    this.revenue = this.tariff * this.Indications
 
   }
 }
@@ -77,7 +82,8 @@ export default {
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   align-items: center;
-  grid-template-columns: 306px 200px 200px;
+  display: grid;
+  grid-template-columns: 306px 200px 200px 200px;
 }
 
 .residentsList__footer {
@@ -85,14 +91,15 @@ export default {
   border-bottom-right-radius: 20px;
   align-items: center;
   padding: 16px;
-  grid-template-columns: 360px 360px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 50px 0 40px;
 }
 
 .residentsList__header, .residentsList__footer {
-  width: 747px;
+  width: 940px;
   height: 48px;
   background: #49454F;
-  display: grid;
 }
 
 .residentsList__header > .resident__label {

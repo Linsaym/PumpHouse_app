@@ -8,6 +8,9 @@
     <div class="resident__label">
       {{ resident.start_date }}
     </div>
+    <div class="resident__label">
+      {{ resident.start_date }}
+    </div>
   </div>
 </template>
 
@@ -28,8 +31,8 @@ export default {
   z-index: 1;
   display: grid;
   align-items: center;
-  grid-template-columns: 66px 240px 200px 200px;
-  width: 747px;
+  grid-template-columns: 66px 240px 200px 200px 200px;
+  width: 940px;
   height: 56px;
   background: #1D1B20;
 }
