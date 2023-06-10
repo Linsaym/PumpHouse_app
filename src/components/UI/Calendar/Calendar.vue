@@ -55,6 +55,24 @@ export default {
       IndicationsOnSelectedMonth: 0,
     }
   },
+  watch: {
+    selectedYear(old, newYear) {
+      this.changeSelectedDate()
+      //Господи прости меня за костыль
+      setTimeout(() => {
+        if (this.selectedMonth < 10) {
+          this.changeSelectedMonth(this.selectedMonth + 1)
+        } else {
+          this.changeSelectedMonth(this.selectedMonth - 1)
+
+        }
+      }, 0)
+    },
+    selectedMonth(old, newMonth) {
+      this.changeSelectedDate()
+    },
+
+  },
   methods: {
     changeInputOnTariff() {
       this.inputType = 'Tariff'
@@ -66,7 +84,6 @@ export default {
       this.selectedMonth = selectedMonthIndex
       this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].tariff
       this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].indications
-      this.changeSelectedDate()
     },
     changeTariff(event) {
       const newTariff = event.target.innerText.substring(0, 5)
@@ -83,24 +100,25 @@ export default {
         alert('Пожалуйста сначала выберите месяц')
       } else {
         this.selectedYear = year
-        this.changeSelectedDate()
       }
     },
     changeSelectedDate() {
       this.indicationsAndTariffs = this.AllYears[this.selectedYear]
-      //Если мы находимся на первом месяце, значит, чтобы посчитать разницу счётчиков, нужно взять текущую дату и отнять от неё показания на последнем дне предыдущего года
       let waterSpent
       try {
         waterSpent = this.selectedMonth == 0 ?
             this.IndicationsOnSelectedMonth - this.AllYears[this.selectedYear - 1][11].indications
             : this.IndicationsOnSelectedMonth - this.indicationsAndTariffs[this.selectedMonth - 1].indications
+        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
+        this.$emit('changeWaterSpent', waterSpent, this.tariffOnSelectedMonth)
       } catch (err) {
         alert('Данные о датах ранее 2021 года ещё не занесены, это тестовая версия приложения. Перезагрузите страницу, чтобы продолжить работу')
         waterSpent = 0
+        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
       }
-      this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
     }
   },
+
 }
 </script>
 <style>

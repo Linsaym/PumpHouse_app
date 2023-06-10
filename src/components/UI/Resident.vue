@@ -9,7 +9,7 @@
       {{ resident.start_date }}
     </div>
     <div class="resident__label">
-      {{ resident.start_date }}
+      {{ payment }}₽
     </div>
   </div>
 </template>
@@ -20,7 +20,11 @@ export default {
   props: {
     resident: {
       type: Object,
+    },
+    payment: {
+      type: Number,
     }
+
   },
 }
 </script>

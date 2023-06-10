@@ -5,8 +5,15 @@ import Modal from "@/components/UI/Modal/Modal.vue";
 </script>
 <template>
   <div class="wrapper homePage">
-    <ResidentsList :residents="residents" @openModal="openModal" :Indications="Indications"/>
-    <Calendar @changeSelectedDate="changeSelectedDate"/>
+    <ResidentsList
+        :residents="residents"
+        @openModal="openModal"
+        :Indications="Indications"
+        :revenue="revenue"
+        :tariff="tariff"
+        :waterSpent="waterSpent"
+    />
+    <Calendar @changeSelectedDate="changeSelectedDate" @changeWaterSpent="changeWaterSpent"/>
     <Modal @closeModal="closeModal" :class="{'showModal':showModal}" @addResident="addResident"/>
   </div>
 </template>
@@ -19,7 +26,10 @@ export default {
       showModal: false,
       residents: Residents,
       selectedDate: new Date('2000-01-01'),
-      Indications: 0
+      Indications: 0,
+      revenue: 0,
+      tariff: 0,
+      waterSpent: 0,
     }
   },
   methods: {
@@ -33,16 +43,23 @@ export default {
       this.closeModal()
       this.residents.push({fio: fio, area: area, start_date: start_date})
     },
-    changeSelectedDate(year, month, waterSpent, tariff) {
+    changeSelectedDate(year, month) {
       this.selectedDate = new Date(year, month + 1)
       this.residents = Residents.filter((resident) => {
         const residentRegDate = new Date(resident.start_date)
         return residentRegDate.getTime() <= this.selectedDate.getTime()
       })
-      if (waterSpent <= 0) {
-        alert('Пожалуйста перезагрузите страницу, скорее всего вы вышли за пределы созданных дат')
-      }
 
+    },
+    changeWaterSpent(waterSpent, tariff) {
+      if (waterSpent < 0) {
+        //alert('Пожалуйста перезагрузите страницу, скорее всего вы вышли за пределы созданных дат, или неправильно внесли показания.\n\n Если же вы уверенны, что всё сделали правильно, просто продолжайте работу')
+      } else {
+        console.log()
+        this.tariff = tariff
+        this.waterSpent = waterSpent
+        this.revenue = parseInt(waterSpent) * parseInt(tariff)
+      }
     }
   }
 }

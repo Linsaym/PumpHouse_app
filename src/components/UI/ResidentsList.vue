@@ -7,12 +7,14 @@
       <button class="resident__label">Сумма платежа</button>
     </div>
     <div class="residentsList">
-      <Resident :resident="resident" v-for="resident in residents"/>
+      <Resident :resident="resident" v-for="resident in residents"
+                :payment="Math.ceil((resident.area/calculateArea)*revenue)"/>
     </div>
     <div class="residentsList__footer">
-      <span>Общая площадь: {{ areaSum }} м²</span>
+      <span>Общая площадь: {{ calculateArea }} м²</span>
       <span>Количество пользователей: {{ residents.length }}</span>
       <span>Выручка: {{ revenue }} рублей</span>
+      <span>Расход: {{ waterSpent }}м³</span>
     </div>
   </div>
 </template>
@@ -30,26 +32,26 @@ export default {
     dateForFilter: {
       type: Date,
     },
-    Indications: {
+    revenue: {
+      type: Number
+    },
+    tariff: {
       type: Number,
+      default: 0
+    },
+    waterSpent: {
+      type: Number,
+      default: 0,
     }
   },
-  data() {
-    return {
-      tariff: 98,
-      areaSum: 0,
-      revenue: 0,
-
+  computed: {
+    calculateArea() {
+      return this.residents.reduce((previousValue, currentValue) => {
+        return {area: parseInt(previousValue.area) + parseInt(currentValue.area)}
+      }).area
     }
   },
-  mounted() {
-    this.areaSum =
-        this.residents.reduce((previousValue, currentValue) => {
-          return {area: parseInt(previousValue.area) + parseInt(currentValue.area)}
-        }).area
-    this.revenue = this.tariff * this.Indications
 
-  }
 }
 </script>
 <style>
