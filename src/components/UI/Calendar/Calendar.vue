@@ -76,7 +76,7 @@ export default {
     changeIndications(event) {
       const newIndications = event.target.innerText.substring(0, 6)
       this.IndicationsOnSelectedMonth = newIndications
-      this.indications[this.selectedMonth] = newIndications
+      this.indicationsAndTariffs[this.selectedMonth].indications = newIndications
     },
     changeSelectedYear(year) {
       if (this.selectedMonth == null) {
