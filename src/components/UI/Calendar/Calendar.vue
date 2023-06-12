@@ -149,12 +149,13 @@ export default {
     },
   },
   mounted() {
+    const today = (new Date()).getFullYear()
     //Почему нам нужно 3 года? Потому, что если выбран январь, и мы переходим на предыдущий год, нам нужно взять данные с позапрошлого года
-    this.fetchYear(2023).then(() => {
-      this.indicationsAndTariffs = this.AllYears[2023]
+    this.fetchYear(today).then(() => {
+      this.indicationsAndTariffs = this.AllYears[today]
     })
-    this.fetchYear(2022)
-    this.fetchYear(2021)
+    this.fetchYear(today - 1)
+    this.fetchYear(today - 2)
   }
 
 }
