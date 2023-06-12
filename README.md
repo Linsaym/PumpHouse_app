@@ -12,6 +12,10 @@
 В настройках <a href="">Open Server</a> выберите версию PHP - 8.1, базу данных 'MySQL 8.0-Win10' и "Apache 2.4-PHP
 8.0-8.1+Nginx 1.23"
 
+####
+
+Запустите Open Server (флажок в трее должен быть зелёным)
+
 ##
 
 Далее, клонируйте репозиторий c API себе:
@@ -23,6 +27,10 @@ git clone https://github.com/Linsaym/PumpHouse_API
 И последовательно выполните следующие команды:
 
 ```sh
+composer install
+```
+
+```sh
 php artisan migrate
 ```
 
@@ -31,7 +39,8 @@ php artisan serve
 ```
 
 Либо вы можете использовать уже предложенную базу
-данных <a href='https://github.com/Linsaym/PumpHouse_API/blob/master/pumphouse.sql'>pumphouse.sql</a>
+данных <a href='https://github.com/Linsaym/PumpHouse_API/blob/master/pumphouse.sql'>pumphouse.sql</a> и не выполнять
+команду "php artisan migrate"
 
 Теперь для запуска приложения достаточно взять папку build из этого репозитория и поместить её в папку domains в Open
 Server. И можно будет пользоваться приложением :)
