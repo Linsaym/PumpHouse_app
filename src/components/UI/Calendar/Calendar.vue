@@ -90,6 +90,7 @@ export default {
       if (this.AllYears[year - 1] == undefined) {
         this.fetchYear(year - 1)
       }
+      this.$emit('changeSelectedDate', this.selectedDate.year, this.selectedDate.month)
     },
     changeInputOnTariff() {
       this.inputType = 'Tariff'

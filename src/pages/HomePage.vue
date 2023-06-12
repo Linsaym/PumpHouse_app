@@ -5,15 +5,15 @@ import Modal from "@/components/UI/Modal/Modal.vue";
 </script>
 <template>
   <div class="wrapper homePage">
-    <!--    <ResidentsList-->
-    <!--        :residents="showResidents"-->
-    <!--        @openModal="openModal"-->
-    <!--        :Indications="Indications"-->
-    <!--        :revenue="revenue"-->
-    <!--        :tariff="tariff"-->
-    <!--        :waterSpent="waterSpent"-->
-    <!--    />-->
-    <Calendar @changeSelectedDate="changeSelectedDate" @changeWaterSpent="changeWaterSpent"/>
+    <ResidentsList
+        :residents="showResidents"
+        @openModal="openModal"
+        :Indications="Indications"
+        :revenue="revenue"
+        :tariff="tariff"
+        :waterSpent="waterSpent"
+    />
+    <Calendar @changeSelectedDate="тзь кшт вум" @changeWaterSpent="changeWaterSpent"/>
     <Modal @closeModal="closeModal" :class="{'showModal':showModal}" @addResident="addResident"/>
   </div>
 </template>
