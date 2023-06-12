@@ -2,11 +2,13 @@
   <div class="calendar">
     <div class="calendar__header">Редактирование тарифа за месяц</div>
     <div class="calendar__year">
-      <YearSlider @changeSelectedYear="changeSelectedYear" :selectedYear="selectedYear" :active="selectedMonth!=null"/>
+      <YearSlider @changeSelectedYear="(year)=>changeSelectedDate(year,0)"/>
     </div>
     <div class="calendar__main">
-      <CalendarMonth v-for="(month,i) in months" :key="indicationsAndTariffs[i].indications + month" :month="month"
-                     :isSelected="i==selectedMonth"
+      <CalendarMonth v-for="(month,i) in months"
+                     :key="indicationsAndTariffs[i].indications + month + indicationsAndTariffs[i].tariff"
+                     :month="month"
+                     :isSelected="i==selectedDate.month"
                      :monthIndex="i"
                      :indicationsAndTariff="indicationsAndTariffs[i]"
                      @changeSelectedMonth="changeSelectedMonth"
@@ -47,8 +49,7 @@ export default {
   data() {
     return {
       inputType: '',
-      selectedYear: 2023,
-      selectedMonth: null,
+      selectedDate: {year: 2023, month: 0},
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       indicationsAndTariffs: IndicationsAndTariffs[2023],
       AllYears: {
@@ -71,25 +72,25 @@ export default {
       IndicationsOnSelectedMonth: 0,
     }
   },
-  watch: {
-    selectedYear(old, newYear) {
-      this.changeSelectedDate()
-      //Господи прости меня за костыль
-      setTimeout(() => {
-        if (this.selectedMonth < 10) {
-          this.changeSelectedMonth(this.selectedMonth + 1)
-        } else {
-          this.changeSelectedMonth(this.selectedMonth - 1)
-
-        }
-      }, 0)
-    },
-    selectedMonth(old, newMonth) {
-      this.changeSelectedDate()
-    },
-
-  },
   methods: {
+    changeSelectedDate(year, month) {
+      if (this.AllYears[year] == undefined) {
+        this.fetchYear(year).then(() => {
+          this.indicationsAndTariffs = this.AllYears[year]
+          this.selectedDate.year = year
+          this.selectedDate.month = month
+        })
+      } else {
+        this.indicationsAndTariffs = this.AllYears[year]
+        this.selectedDate.year = year
+        this.selectedDate.month = month
+      }
+
+      //Если выбран Январь, то нам понадобятся данные о счётчике прошлого года. Поэтому всегда обязательно иметь данные о текущем и предыдущем годе
+      if (this.AllYears[year - 1] == undefined) {
+        this.fetchYear(year - 1)
+      }
+    },
     changeInputOnTariff() {
       this.inputType = 'Tariff'
     },
@@ -97,41 +98,21 @@ export default {
       this.inputType = 'Indications'
     },
     changeSelectedMonth(selectedMonthIndex) {
-      this.selectedMonth = selectedMonthIndex
-      this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].tariff
-      this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].indications
+      this.selectedDate.month = selectedMonthIndex
+      this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].tariff
+      this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].indications
     },
     changeTariff(event) {
       const newTariff = event.target.innerText.substring(0, 5)
       this.tariffOnSelectedMonth = newTariff
-      this.indicationsAndTariffs[this.selectedMonth].tariff = newTariff
+      this.indicationsAndTariffs[this.selectedDate.month].tariff = newTariff
+      this.updateTariff(this.selectedDate.year, this.selectedDate.month, newTariff)
     },
     changeIndications(event) {
       const newIndications = event.target.innerText.substring(0, 6)
       this.IndicationsOnSelectedMonth = newIndications
-      this.indicationsAndTariffs[this.selectedMonth].indications = newIndications
-    },
-    changeSelectedYear(year) {
-      if (this.selectedMonth == null) {
-        alert('Пожалуйста сначала выберите месяц')
-      } else {
-        this.selectedYear = year
-      }
-    },
-    changeSelectedDate() {
-      this.indicationsAndTariffs = this.AllYears[this.selectedYear]
-      let waterSpent
-      try {
-        waterSpent = this.selectedMonth == 0 ?
-            this.IndicationsOnSelectedMonth - this.AllYears[this.selectedYear - 1][11].indications
-            : this.IndicationsOnSelectedMonth - this.indicationsAndTariffs[this.selectedMonth - 1].indications
-        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
-        this.$emit('changeWaterSpent', waterSpent, this.tariffOnSelectedMonth)
-      } catch (err) {
-        console.log(err)
-        waterSpent = 0
-        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
-      }
+      this.indicationsAndTariffs[this.selectedDate.month].indications = newIndications
+      this.updateIndications(this.selectedDate.year, this.selectedDate.month, newIndications)
     },
     async fetchYear(year) {
       try {
@@ -139,21 +120,25 @@ export default {
         let thisYear = {}
         thisYear[year] = []//Создаём пустой массив, чтобы потом в него добавлять объекты
         response.data.forEach((elem) => {
-          thisYear[year][elem.month] = {tariff: elem.indications, indications: elem.tariff}
+          thisYear[year][elem.month] = {tariff: elem.tariff, indications: elem.indications}
         })
         this.AllYears[year] = thisYear[year]
       } catch (err) {
         alert('Ошибка при добавлении пользователя')
       }
-    }
+    },
+    async updateTariff(year, month, tariff) {
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {tariff: tariff})
+    },
+    async updateIndications(year, month, indications) {
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {indications: indications})
+    },
   },
   mounted() {
     this.fetchYear(2023).then(() => {
       this.indicationsAndTariffs = this.AllYears[2023]
     })
-    this.fetchYear(2022).then(() => {
-      this.indicationsAndTariffs = this.AllYears[2023]
-    })
+    this.fetchYear(2022)
   }
 
 }
