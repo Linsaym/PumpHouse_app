@@ -142,10 +142,10 @@ export default {
       }
     },
     async updateTariff(year, month, tariff) {
-      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {tariff: tariff})
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_tariff/${year}/${month}`, {tariff: parseInt(tariff)})
     },
     async updateIndications(year, month, indications) {
-      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {indications: indications})
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {indications: parseInt(indications)})
     },
   },
   mounted() {
