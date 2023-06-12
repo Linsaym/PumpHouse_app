@@ -4,7 +4,7 @@
 <h3 align="center">Приложение же в свою очередь фильтрует и отображает(в зависимости от выбранного месяца) в таблице занесённых вами пользователей, а так же производит расчёты сколько каждый дачник должен вам заплатить.</h3>
 
 <h4 align="center">По всем вопросам сюда <a href="https://vk.com/linsaym">https://vk.com/linsaym </a></h4>
-
+<h4 align="center">Видео инструкция: <a href="https://www.youtube.com/watch?v=AiSL4S9fTdg">https://www.youtube.com/watch?v=AiSL4S9fTdg </a></h4>
 ## Для запуска сервера
 
 Убедитесь что у вас установленны "<a href="">Open Server</a>" и "<a href="https://getcomposer.org/">Composer</a>"
