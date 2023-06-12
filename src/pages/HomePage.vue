@@ -13,7 +13,7 @@ import Modal from "@/components/UI/Modal/Modal.vue";
         :tariff="tariff"
         :waterSpent="waterSpent"
     />
-    <Calendar @changeSelectedDate="тзь кшт вум" @changeWaterSpent="changeWaterSpent"/>
+    <Calendar @changeSelectedDate="changeSelectedDate" @changeWaterSpent="changeWaterSpent"/>
     <Modal @closeModal="closeModal" :class="{'showModal':showModal}" @addResident="addResident"/>
   </div>
 </template>
