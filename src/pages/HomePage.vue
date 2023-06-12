@@ -54,13 +54,16 @@ export default {
       this.allResidents.push(resident)
       this.postResident(resident)
     },
-    changeSelectedDate(year, month) {
-      this.selectedDate = new Date(year, month + 1)
+    filterResidents() {
       this.showResidents = this.allResidents.filter((resident) => {
         const residentRegDate = new Date(resident.start_date)
         return residentRegDate.getTime() <= this.selectedDate.getTime()
       })
-
+    },
+    changeSelectedDate(year, month) {
+      //Единица прибавляется для того, чтобы отображались пользователи зарегистрированные в этом месяце
+      this.selectedDate = new Date(year, month + 1)
+      this.filterResidents()
     },
     changeWaterSpent(waterSpent, tariff) {
       if (waterSpent < 0) {

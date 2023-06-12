@@ -73,6 +73,15 @@ export default {
     }
   },
   methods: {
+    sendDataUp() {
+      this.$emit('changeSelectedDate', this.selectedDate.year, this.selectedDate.month)
+      const indications = this.indicationsAndTariffs[this.selectedDate.month].indications
+      const prevIndications = this.selectedDate.month > 0 ? this.indicationsAndTariffs[this.selectedDate.month - 1].indications : this.AllYears[this.selectedDate.year - 1][11].indications
+      const waterSpent = indications - prevIndications
+      console.log(waterSpent)
+      const tariff = this.indicationsAndTariffs[this.selectedDate.month].tariff
+      this.$emit('changeWaterSpent', waterSpent, tariff)
+    },
     changeSelectedDate(year, month) {
       if (this.AllYears[year] == undefined) {
         this.fetchYear(year).then(() => {
@@ -85,12 +94,11 @@ export default {
         this.selectedDate.year = year
         this.selectedDate.month = month
       }
-
       //Если выбран Январь, то нам понадобятся данные о счётчике прошлого года. Поэтому всегда обязательно иметь данные о текущем и предыдущем годе
       if (this.AllYears[year - 1] == undefined) {
         this.fetchYear(year - 1)
       }
-      this.$emit('changeSelectedDate', this.selectedDate.year, this.selectedDate.month)
+      this.sendDataUp()
     },
     changeInputOnTariff() {
       this.inputType = 'Tariff'
@@ -102,6 +110,7 @@ export default {
       this.selectedDate.month = selectedMonthIndex
       this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].tariff
       this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].indications
+      this.sendDataUp()
     },
     changeTariff(event) {
       const newTariff = event.target.innerText.substring(0, 5)
