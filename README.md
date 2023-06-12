@@ -36,6 +36,8 @@ composer install
 php artisan migrate
 ```
 
+Переименуйте файл <strong>.env.example</strong> в <strong>.env</strong> и настройте файл под себя
+
 ```sh
 php artisan serve
 ```
