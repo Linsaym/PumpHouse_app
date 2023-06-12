@@ -27,7 +27,7 @@ git clone https://github.com/Linsaym/PumpHouse_API
 ```
 Переименуйте файл <strong>.env.example</strong> в <strong>.env</strong> и настройте файл под себя.
 ####
-Обязательно установите <strong>DB_DATABASE=pumphouse</strong> и <strong>APP_URL=http://dist</strong>
+Обязательно установите <strong>DB_DATABASE=pumphouse</strong> и <strong>APP_URL=http://build</strong>
 ####
 И последовательно выполните следующие команды:
 
