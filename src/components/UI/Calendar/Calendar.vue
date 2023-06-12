@@ -36,6 +36,7 @@
 import CalendarMonth from "@/components/UI/Calendar/CalendarMonth.vue"
 import YearSlider from "@/components/UI/Calendar/YearSlider.vue";
 import IndicationsAndTariffs from "@/data_for_tests/Indications";
+import axios from "axios";
 
 export default {
   name: "Calendar",
@@ -50,7 +51,22 @@ export default {
       selectedMonth: null,
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       indicationsAndTariffs: IndicationsAndTariffs[2023],
-      AllYears: IndicationsAndTariffs,
+      AllYears: {
+        "2023": [
+          {tariff: 50, indications: 34234},
+          {tariff: 53, indications: 45923},
+          {tariff: 50, indications: 46651},
+          {tariff: 56, indications: 49452},
+          {tariff: 55, indications: 56123},
+          {tariff: 50, indications: 58231},
+          {tariff: 59, indications: 58422},
+          {tariff: 58, indications: 59231},
+          {tariff: 56, indications: 60231},
+          {tariff: 50, indications: 61231},
+          {tariff: 53, indications: 62312},
+          {tariff: 54, indications: 74231},
+        ],
+      },
       tariffOnSelectedMonth: 0,
       IndicationsOnSelectedMonth: 0,
     }
@@ -116,8 +132,35 @@ export default {
         waterSpent = 0
         this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
       }
+    },
+    async fetchAllYears(year) {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/get_periods/${year}`)
+        let prevYear = {}
+        let thisYear = {}
+        thisYear[year] = []//Создаём пустой массив, чтобы потом в него добавлять объекты
+        prevYear[year - 1] = [] //Создаём пустой массив, чтобы потом в него добавлять объекты
+        response.data.forEach((elem) => {
+          if (elem.year == year) {
+            thisYear[year][elem.month] = {tariff: elem.indications, indications: elem.tariff}
+          } else {
+            prevYear[year - 1][elem.month] = {tariff: elem.indications, indications: elem.tariff}
+          }
+        })
+        if (this.AllYears[year - 1] == undefined) {
+          this.AllYears[year - 1] = prevYear[year - 1]
+        }
+        this.AllYears[year] = thisYear[year]
+      } catch (err) {
+        alert('Ошибка при добавлении пользователя')
+      }
     }
   },
+  mounted() {
+    this.fetchAllYears(2023).then(() => {
+      this.indicationsAndTariffs = this.AllYears[2023]
+    })
+  }
 
 }
 </script>

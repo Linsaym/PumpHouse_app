@@ -6,7 +6,7 @@ import Modal from "@/components/UI/Modal/Modal.vue";
 <template>
   <div class="wrapper homePage">
     <ResidentsList
-        :residents="residents"
+        :residents="showResidents"
         @openModal="openModal"
         :Indications="Indications"
         :revenue="revenue"
@@ -18,13 +18,22 @@ import Modal from "@/components/UI/Modal/Modal.vue";
   </div>
 </template>
 <script>
-import Residents from "@/data_for_tests/residents";
+import axios from "axios";
 
 export default {
   data() {
     return {
       showModal: false,
-      residents: Residents,
+      showResidents: [{
+        fio: "Подождите идёт загрузка",
+        area: "111",
+        start_date: "2000-01-01"
+      },],
+      allResidents: [{
+        fio: "Подождите идёт загрузка",
+        area: "111",
+        start_date: "2000-01-01"
+      },],
       selectedDate: new Date('2000-01-01'),
       Indications: 0,
       revenue: 0,
@@ -40,12 +49,14 @@ export default {
       this.showModal = true
     },
     addResident(fio, area, start_date) {
+      const resident = {fio: fio, area: area, start_date: start_date}
       this.closeModal()
-      this.residents.push({fio: fio, area: area, start_date: start_date})
+      this.allResidents.push(resident)
+      this.postResident(resident)
     },
     changeSelectedDate(year, month) {
       this.selectedDate = new Date(year, month + 1)
-      this.residents = Residents.filter((resident) => {
+      this.showResidents = this.allResidents.filter((resident) => {
         const residentRegDate = new Date(resident.start_date)
         return residentRegDate.getTime() <= this.selectedDate.getTime()
       })
@@ -60,7 +71,26 @@ export default {
         this.waterSpent = waterSpent
         this.revenue = parseInt(waterSpent) * parseInt(tariff)
       }
-    }
+    },
+    async fetchResidents() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/residents')
+        this.allResidents = response.data
+        this.showResidents = response.data
+      } catch (err) {
+        alert('Ошибка при загрузке пользователей')
+      }
+    },
+    async postResident(resident) {
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/residents/create', resident)
+      } catch (err) {
+        alert('Ошибка при добавлении пользователя')
+      }
+    },
+  },
+  mounted() {
+    this.fetchResidents()
   }
 }
 </script>
