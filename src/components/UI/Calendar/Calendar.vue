@@ -128,28 +128,19 @@ export default {
         this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
         this.$emit('changeWaterSpent', waterSpent, this.tariffOnSelectedMonth)
       } catch (err) {
-        alert('Данные о датах ранее 2021 года ещё не занесены, это тестовая версия приложения. Перезагрузите страницу, чтобы продолжить работу')
+        console.log(err)
         waterSpent = 0
         this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
       }
     },
-    async fetchAllYears(year) {
+    async fetchYear(year) {
       try {
         const response = await axios.get(`http://127.0.0.1:8000/api/get_periods/${year}`)
-        let prevYear = {}
         let thisYear = {}
         thisYear[year] = []//Создаём пустой массив, чтобы потом в него добавлять объекты
-        prevYear[year - 1] = [] //Создаём пустой массив, чтобы потом в него добавлять объекты
         response.data.forEach((elem) => {
-          if (elem.year == year) {
-            thisYear[year][elem.month] = {tariff: elem.indications, indications: elem.tariff}
-          } else {
-            prevYear[year - 1][elem.month] = {tariff: elem.indications, indications: elem.tariff}
-          }
+          thisYear[year][elem.month] = {tariff: elem.indications, indications: elem.tariff}
         })
-        if (this.AllYears[year - 1] == undefined) {
-          this.AllYears[year - 1] = prevYear[year - 1]
-        }
         this.AllYears[year] = thisYear[year]
       } catch (err) {
         alert('Ошибка при добавлении пользователя')
@@ -157,7 +148,10 @@ export default {
     }
   },
   mounted() {
-    this.fetchAllYears(2023).then(() => {
+    this.fetchYear(2023).then(() => {
+      this.indicationsAndTariffs = this.AllYears[2023]
+    })
+    this.fetchYear(2022).then(() => {
       this.indicationsAndTariffs = this.AllYears[2023]
     })
   }
