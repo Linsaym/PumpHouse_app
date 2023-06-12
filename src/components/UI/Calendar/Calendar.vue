@@ -2,11 +2,13 @@
   <div class="calendar">
     <div class="calendar__header">Редактирование тарифа за месяц</div>
     <div class="calendar__year">
-      <YearSlider @changeSelectedYear="changeSelectedYear" :selectedYear="selectedYear" :active="selectedMonth!=null"/>
+      <YearSlider @changeSelectedYear="(year)=>changeSelectedDate(year,0)"/>
     </div>
     <div class="calendar__main">
-      <CalendarMonth v-for="(month,i) in months" :key="indicationsAndTariffs[i].indications + month" :month="month"
-                     :isSelected="i==selectedMonth"
+      <CalendarMonth v-for="(month,i) in months"
+                     :key="indicationsAndTariffs[i].indications + month + indicationsAndTariffs[i].tariff"
+                     :month="month"
+                     :isSelected="i==selectedDate.month"
                      :monthIndex="i"
                      :indicationsAndTariff="indicationsAndTariffs[i]"
                      @changeSelectedMonth="changeSelectedMonth"
@@ -36,6 +38,7 @@
 import CalendarMonth from "@/components/UI/Calendar/CalendarMonth.vue"
 import YearSlider from "@/components/UI/Calendar/YearSlider.vue";
 import IndicationsAndTariffs from "@/data_for_tests/Indications";
+import axios from "axios";
 
 export default {
   name: "Calendar",
@@ -46,34 +49,61 @@ export default {
   data() {
     return {
       inputType: '',
-      selectedYear: 2023,
-      selectedMonth: null,
+      selectedDate: {year: 2023, month: 0},
       months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
       indicationsAndTariffs: IndicationsAndTariffs[2023],
-      AllYears: IndicationsAndTariffs,
+      AllYears: {
+        "2023": [
+          {tariff: 50, indications: 34234},
+          {tariff: 53, indications: 45923},
+          {tariff: 50, indications: 46651},
+          {tariff: 56, indications: 49452},
+          {tariff: 55, indications: 56123},
+          {tariff: 50, indications: 58231},
+          {tariff: 59, indications: 58422},
+          {tariff: 58, indications: 59231},
+          {tariff: 56, indications: 60231},
+          {tariff: 50, indications: 61231},
+          {tariff: 53, indications: 62312},
+          {tariff: 54, indications: 74231},
+        ],
+      },
       tariffOnSelectedMonth: 0,
       IndicationsOnSelectedMonth: 0,
     }
   },
-  watch: {
-    selectedYear(old, newYear) {
-      this.changeSelectedDate()
-      //Господи прости меня за костыль
-      setTimeout(() => {
-        if (this.selectedMonth < 10) {
-          this.changeSelectedMonth(this.selectedMonth + 1)
-        } else {
-          this.changeSelectedMonth(this.selectedMonth - 1)
-
-        }
-      }, 0)
-    },
-    selectedMonth(old, newMonth) {
-      this.changeSelectedDate()
-    },
-
-  },
   methods: {
+    sendDataUp() {
+      this.$emit('changeSelectedDate', this.selectedDate.year, this.selectedDate.month)
+      const indications = this.indicationsAndTariffs[this.selectedDate.month].indications
+      const prevIndications = this.selectedDate.month > 0 ? this.indicationsAndTariffs[this.selectedDate.month - 1].indications : this.AllYears[this.selectedDate.year - 1][11].indications
+      const waterSpent = indications - prevIndications
+      console.log(waterSpent)
+      const tariff = this.indicationsAndTariffs[this.selectedDate.month].tariff
+      this.$emit('changeWaterSpent', waterSpent, tariff)
+    },
+    changeSelectedDate(year, month) {
+      if (this.AllYears[year] == undefined) {
+        this.fetchYear(year).then(() => {
+          this.indicationsAndTariffs = this.AllYears[year]
+          this.selectedDate.year = year
+          this.selectedDate.month = month
+        })
+      } else {
+        this.indicationsAndTariffs = this.AllYears[year]
+        this.selectedDate.year = year
+        this.selectedDate.month = month
+      }
+      //Если выбран Январь, то нам понадобятся данные о счётчике прошлого года. Поэтому всегда обязательно иметь данные о текущем и предыдущем годе
+      //Почему нам нужно 3 года? Потому, что если выбран январь, и мы переходим на предыдущий год, нам нужно взять данные с позапрошлого года
+      if (this.AllYears[year - 1] == undefined) {
+        this.fetchYear(year - 1)
+      }
+      if (this.AllYears[year - 2] == undefined) {
+        this.fetchYear(year - 2)
+      }
+      this.sendDataUp()
+    },
     changeInputOnTariff() {
       this.inputType = 'Tariff'
     },
@@ -81,43 +111,52 @@ export default {
       this.inputType = 'Indications'
     },
     changeSelectedMonth(selectedMonthIndex) {
-      this.selectedMonth = selectedMonthIndex
-      this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].tariff
-      this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedMonth].indications
+      this.selectedDate.month = selectedMonthIndex
+      this.tariffOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].tariff
+      this.IndicationsOnSelectedMonth = this.indicationsAndTariffs[this.selectedDate.month].indications
+      this.sendDataUp()
     },
     changeTariff(event) {
       const newTariff = event.target.innerText.substring(0, 5)
       this.tariffOnSelectedMonth = newTariff
-      this.indicationsAndTariffs[this.selectedMonth].tariff = newTariff
+      this.indicationsAndTariffs[this.selectedDate.month].tariff = newTariff
+      this.updateTariff(this.selectedDate.year, this.selectedDate.month, newTariff)
     },
     changeIndications(event) {
       const newIndications = event.target.innerText.substring(0, 6)
       this.IndicationsOnSelectedMonth = newIndications
-      this.indicationsAndTariffs[this.selectedMonth].indications = newIndications
+      this.indicationsAndTariffs[this.selectedDate.month].indications = newIndications
+      this.updateIndications(this.selectedDate.year, this.selectedDate.month, newIndications)
     },
-    changeSelectedYear(year) {
-      if (this.selectedMonth == null) {
-        alert('Пожалуйста сначала выберите месяц')
-      } else {
-        this.selectedYear = year
-      }
-    },
-    changeSelectedDate() {
-      this.indicationsAndTariffs = this.AllYears[this.selectedYear]
-      let waterSpent
+    async fetchYear(year) {
       try {
-        waterSpent = this.selectedMonth == 0 ?
-            this.IndicationsOnSelectedMonth - this.AllYears[this.selectedYear - 1][11].indications
-            : this.IndicationsOnSelectedMonth - this.indicationsAndTariffs[this.selectedMonth - 1].indications
-        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth)
-        this.$emit('changeWaterSpent', waterSpent, this.tariffOnSelectedMonth)
+        const response = await axios.get(`http://127.0.0.1:8000/api/get_periods/${year}`)
+        let thisYear = {}
+        thisYear[year] = []//Создаём пустой массив, чтобы потом в него добавлять объекты
+        response.data.forEach((elem) => {
+          thisYear[year][elem.month] = {tariff: elem.tariff, indications: elem.indications}
+        })
+        this.AllYears[year] = thisYear[year]
       } catch (err) {
-        alert('Данные о датах ранее 2021 года ещё не занесены, это тестовая версия приложения. Перезагрузите страницу, чтобы продолжить работу')
-        waterSpent = 0
-        this.$emit('changeSelectedDate', this.selectedYear, this.selectedMonth, waterSpent, this.tariffOnSelectedMonth)
+        alert('Ошибка при добавлении пользователя')
       }
-    }
+    },
+    async updateTariff(year, month, tariff) {
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {tariff: tariff})
+    },
+    async updateIndications(year, month, indications) {
+      const response = await axios.put(`http://127.0.0.1:8000/api/update_indications/${year}/${month}`, {indications: indications})
+    },
   },
+  mounted() {
+    const today = (new Date()).getFullYear()
+    //Почему нам нужно 3 года? Потому, что если выбран январь, и мы переходим на предыдущий год, нам нужно взять данные с позапрошлого года
+    this.fetchYear(today).then(() => {
+      this.indicationsAndTariffs = this.AllYears[today]
+    })
+    this.fetchYear(today - 1)
+    this.fetchYear(today - 2)
+  }
 
 }
 </script>

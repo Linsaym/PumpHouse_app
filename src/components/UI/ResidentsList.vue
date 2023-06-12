@@ -46,9 +46,14 @@ export default {
   },
   computed: {
     calculateArea() {
-      return this.residents.reduce((previousValue, currentValue) => {
-        return {area: parseInt(previousValue.area) + parseInt(currentValue.area)}
-      }).area
+      if (this.residents.length > 0) {
+        return this.residents.reduce((previousValue, currentValue) => {
+          return {area: parseInt(previousValue.area) + parseInt(currentValue.area)}
+        }).area
+      } else {
+        return 0
+      }
+
     }
   },
 

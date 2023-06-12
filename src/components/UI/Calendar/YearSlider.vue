@@ -15,11 +15,6 @@
 
 export default {
   name: 'yearSlider',
-  props: {
-    active: {
-      type: Boolean
-    },
-  },
   data() {
     return {
       year: 2023,
@@ -27,21 +22,17 @@ export default {
   },
   methods: {
     prevYear() {
-      if (this.active) {
-        this.year -= 1
-        this.$emit('changeSelectedYear', this.year)
-      } else {
-        alert('Пожалуйста сначала выберите месяц')
-      }
+      this.year -= 1
+      this.$emit('changeSelectedYear', this.year)
     },
     nextYear() {
-      if (this.active) {
-        this.year += 1
-        this.$emit('changeSelectedYear', this.year)
-      } else {
-        alert('Пожалуйста сначала выберите месяц')
-      }
+      this.year += 1
+      this.$emit('changeSelectedYear', this.year)
     }
+  },
+  mounted() {
+    const today = new Date()
+    this.year = today.getFullYear()
   }
 };
 </script>
