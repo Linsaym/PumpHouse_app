@@ -95,8 +95,12 @@ export default {
         this.selectedDate.month = month
       }
       //Если выбран Январь, то нам понадобятся данные о счётчике прошлого года. Поэтому всегда обязательно иметь данные о текущем и предыдущем годе
+      //Почему нам нужно 3 года? Потому, что если выбран январь, и мы переходим на предыдущий год, нам нужно взять данные с позапрошлого года
       if (this.AllYears[year - 1] == undefined) {
         this.fetchYear(year - 1)
+      }
+      if (this.AllYears[year - 2] == undefined) {
+        this.fetchYear(year - 2)
       }
       this.sendDataUp()
     },
@@ -145,10 +149,12 @@ export default {
     },
   },
   mounted() {
+    //Почему нам нужно 3 года? Потому, что если выбран январь, и мы переходим на предыдущий год, нам нужно взять данные с позапрошлого года
     this.fetchYear(2023).then(() => {
       this.indicationsAndTariffs = this.AllYears[2023]
     })
     this.fetchYear(2022)
+    this.fetchYear(2021)
   }
 
 }

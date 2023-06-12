@@ -17,7 +17,7 @@ export default {
   name: 'yearSlider',
   data() {
     return {
-      year: new Date().getFullYear(),
+      year: 2023,
     }
   },
   methods: {
@@ -29,6 +29,10 @@ export default {
       this.year += 1
       this.$emit('changeSelectedYear', this.year)
     }
+  },
+  mounted() {
+    const today = new Date()
+    this.year = today.getFullYear()
   }
 };
 </script>
