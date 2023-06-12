@@ -25,7 +25,10 @@
 ```sh
 git clone https://github.com/Linsaym/PumpHouse_API
 ```
-
+Переименуйте файл <strong>.env.example</strong> в <strong>.env</strong> и настройте файл под себя.
+####
+Обязательно установите <strong>DB_DATABASE=pumphouse</strong> и <strong>APP_URL=http://dist</strong>
+####
 И последовательно выполните следующие команды:
 
 ```sh
@@ -39,8 +42,6 @@ php artisan key:generate
 ```sh
 php artisan migrate
 ```
-
-Переименуйте файл <strong>.env.example</strong> в <strong>.env</strong> и настройте файл под себя
 
 ```sh
 php artisan serve
