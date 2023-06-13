@@ -121,12 +121,14 @@ export default {
       this.tariffOnSelectedMonth = newTariff
       this.indicationsAndTariffs[this.selectedDate.month].tariff = newTariff
       this.updateTariff(this.selectedDate.year, this.selectedDate.month, newTariff)
+      this.sendDataUp()
     },
     changeIndications(event) {
       const newIndications = event.target.innerText.substring(0, 6)
       this.IndicationsOnSelectedMonth = newIndications
       this.indicationsAndTariffs[this.selectedDate.month].indications = newIndications
       this.updateIndications(this.selectedDate.year, this.selectedDate.month, newIndications)
+      this.sendDataUp()
     },
     async fetchYear(year) {
       try {
