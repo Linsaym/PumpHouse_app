@@ -7,14 +7,17 @@ import Modal from "@/components/UI/Modal/Modal.vue";
   <div class="wrapper homePage">
     <ResidentsList
         :residents="showResidents"
-        @openModal="openModal"
         :Indications="Indications"
         :revenue="revenue"
         :tariff="tariff"
         :waterSpent="waterSpent"
+        @openModalUpdate="openModalUpdate"
+        @openModalAdd="openModalAdd"
     />
     <Calendar @changeSelectedDate="changeSelectedDate" @changeWaterSpent="changeWaterSpent"/>
-    <Modal @closeModal="closeModal" :class="{'showModal':showModal}" @addResident="addResident"/>
+    <Modal :modal_type="modal_type" @closeModal="closeModal"
+           :resident="updateResident"
+           @addResident="addResident"/>
   </div>
 </template>
 <script>
@@ -23,7 +26,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      showModal: false,
+      modal_type: false,
+      updateResident: null,
       showResidents: [{
         fio: "Подождите идёт загрузка",
         area: "111",
@@ -42,11 +46,15 @@ export default {
     }
   },
   methods: {
-    closeModal() {
-      this.showModal = false
+    openModalUpdate(resident) {
+      this.modal_type = 'update'
+      this.updateResident = resident
     },
-    openModal() {
-      this.showModal = true
+    closeModal() {
+      this.modal_type = false
+    },
+    openModalAdd() {
+      this.modal_type = 'add'
     },
     addResident(fio, area, start_date) {
       const resident = {fio: fio, area: area, start_date: start_date}
@@ -109,9 +117,5 @@ export default {
 .homePage {
   display: flex;
   justify-content: space-between;
-}
-
-.showModal {
-  display: flex !important;
 }
 </style>

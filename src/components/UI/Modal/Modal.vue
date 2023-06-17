@@ -1,6 +1,6 @@
 <template>
-  <div class="modal">
-    <article class="modal-container">
+  <div class="modal" v-if="modal_type">
+    <article class="modal-container" v-if="modal_type=='add'">
       <img @click="closeModal" src="./icon.svg" alt="close" class="close">
       <div class="modal__title">Добавить пользователя</div>
       <div class="modal__input-block">
@@ -19,11 +19,40 @@
       </div>
       <button @click="addResident" class="modal__btn">Добавить</button>
     </article>
+
+    <article class="modal-container" v-if="modal_type=='update'">
+      <img @click="closeModal" src="./icon.svg" alt="close" class="close">
+      <div class="modal__title">Редактирование и удаление пользователя</div>
+      <div class="modal__input-block">
+        <input type="text" class="modal__input" placeholder="ФИО" v-model="fio">
+        <span v-if="fioValidation" class="validation">{{ fioValidation }}</span>
+      </div>
+      <div class="modal__input-block">
+        <input type="number" min="0" step="1" class="modal__input" placeholder="Площадь участка" v-model="area">
+        <span v-if="areaValidation" class="validation">{{ areaValidation }}</span>
+
+      </div>
+      <div class="modal__input-block">
+        <input type="date" class="modal__input" placeholder="Дата подключения" v-model="start_date">
+        <span v-if="dateValidation" class="validation">{{ dateValidation }}</span>
+
+      </div>
+      <div style="display: flex;justify-content:space-between; width: 370px;">
+        <button @click="deleteResident" class="modal__btn-mini">Удалить</button>
+        <button @click="updateResident" class="modal__btn-mini greenBG">Обновить данные</button>
+      </div>
+    </article>
   </div>
 </template>
 <script>
 export default {
   name: 'modal',
+  props: {
+    modal_type: String | Boolean,
+    resident: {
+      type: Object,
+    },
+  },
   data() {
     return {
       fio: '',
@@ -36,6 +65,14 @@ export default {
     }
   },
   methods: {
+    deleteResident() {
+      this.$emit('deleteResident', this.resident.id)
+    },
+    updateResident() {
+      if (!(this.fioValidation || this.areaValidation || this.dateValidation)) {
+        this.$emit('updateResident', this.resident.id, this.fio, this.area, this.start_date)
+      }
+    },
     closeModal() {
       this.fioValidation = ''
       this.areaValidation = ''
@@ -43,6 +80,12 @@ export default {
       this.$emit('closeModal')
     },
     addResident() {
+      this.validation()
+      if (!(this.fioValidation || this.areaValidation || this.dateValidation)) {
+        this.$emit('addResident', this.fio, this.area, this.start_date)
+      }
+    },
+    validation() {
       if (this.fio.split(" ").length !== 3) {
         this.fioValidation = 'ФИО должно состоять из трёх слов \n Например:"Ивнов Иван Иванович"'
       } else {
@@ -59,15 +102,38 @@ export default {
       } else {
         this.dateValidation = ''
       }
-      if (!(this.fioValidation || this.areaValidation || this.dateValidation)) {
-        this.$emit('addResident', this.fio, this.area, this.start_date)
+    },
+  },
+  watch: {
+    resident: {
+      handler() {
+        if (this.resident != null) {
+          this.fio = this.resident.fio
+          this.area = this.resident.area
+          this.start_date = this.resident.start_date
+        }
       }
     }
-  },
-
+  }
 }
 </script>
 <style scoped>
+.modal__btn-mini {
+  margin-bottom: 40px;
+  width: 165px;
+  height: 68px;
+  background: #da2d29;
+  color: #fff;
+  border: 1px solid #4F4F4F;
+  border-radius: 32px;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.greenBG {
+  background: #38B87C;
+}
+
 .validation {
   margin-top: 10px;
   display: block;
@@ -92,7 +158,7 @@ input::-webkit-inner-spin-button {
 }
 
 .modal {
-  display: none;
+  display: flex;
   z-index: 1000;
   position: absolute;
   top: 0;
@@ -122,6 +188,8 @@ input::-webkit-inner-spin-button {
 
 .modal__title {
   font-size: 20px;
+  width: 300px;
+  text-align: center;
 }
 
 .close {

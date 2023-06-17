@@ -1,14 +1,18 @@
 <template>
   <div class="residentsTable">
     <div class="residentsList__header">
-      <button @click="$emit('openModal')" class="resident__label" style="width: 250px">Добавить пользователя +</button>
+      <button @click="$emit('openModalAdd')" class="resident__label" style="width: 250px">Добавить пользователя +
+      </button>
       <button class="resident__label">Площадь участков</button>
       <button class="resident__label">Дата регистрации</button>
       <button class="resident__label">Сумма платежа</button>
     </div>
     <div class="residentsList">
-      <Resident :resident="resident" v-for="resident in residents"
-                :payment="Math.ceil((resident.area/calculateArea)*revenue)"/>
+      <Resident v-for="resident in residents"
+                :resident="resident"
+                :payment="Math.ceil((resident.area/calculateArea)*revenue)"
+                @dblclick="$emit('openModalUpdate', resident)"
+      />
     </div>
     <div class="residentsList__footer">
       <span>Общая площадь: {{ calculateArea }} м²</span>
