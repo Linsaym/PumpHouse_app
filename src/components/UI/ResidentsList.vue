@@ -7,11 +7,16 @@
       <button class="resident__label">Дата регистрации</button>
       <button class="resident__label">Сумма платежа</button>
     </div>
-    <div class="residentsList">
+    <div class="residentsList" v-if="residents.length>0">
       <Resident v-for="resident in residents"
                 :resident="resident"
                 :payment="Math.ceil((resident.area/calculateArea)*revenue)"
                 @dblclick="$emit('openModalUpdate', resident)"
+      />
+    </div>
+    <div class="residentsList" v-else>
+      <Resident :resident="{id: 0, fio: 'Дачники отсутствуют',area: 0, start_date:'2000-01-01'}"
+                :payment="0"
       />
     </div>
     <div class="residentsList__footer">
@@ -32,9 +37,6 @@ export default {
   props: {
     residents: {
       type: Array,
-    },
-    dateForFilter: {
-      type: Date,
     },
     revenue: {
       type: Number

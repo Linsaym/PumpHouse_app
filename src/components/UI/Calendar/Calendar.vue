@@ -78,7 +78,6 @@ export default {
       const indications = this.indicationsAndTariffs[this.selectedDate.month].indications
       const prevIndications = this.selectedDate.month > 0 ? this.indicationsAndTariffs[this.selectedDate.month - 1].indications : this.AllYears[this.selectedDate.year - 1][11].indications
       const waterSpent = indications - prevIndications
-      console.log(waterSpent)
       const tariff = this.indicationsAndTariffs[this.selectedDate.month].tariff
       this.$emit('changeWaterSpent', waterSpent, tariff)
     },
