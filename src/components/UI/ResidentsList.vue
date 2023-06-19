@@ -1,14 +1,23 @@
 <template>
   <div class="residentsTable">
     <div class="residentsList__header">
-      <button @click="$emit('openModal')" class="resident__label" style="width: 250px">Добавить пользователя +</button>
+      <button @click="$emit('openModalAdd')" class="resident__label" style="width: 250px">Добавить пользователя +
+      </button>
       <button class="resident__label">Площадь участков</button>
       <button class="resident__label">Дата регистрации</button>
       <button class="resident__label">Сумма платежа</button>
     </div>
-    <div class="residentsList">
-      <Resident :resident="resident" v-for="resident in residents"
-                :payment="Math.ceil((resident.area/calculateArea)*revenue)"/>
+    <div class="residentsList" v-if="residents.length>0">
+      <Resident v-for="resident in residents"
+                :resident="resident"
+                :payment="Math.ceil((resident.area/calculateArea)*revenue)"
+                @dblclick="$emit('openModalUpdate', resident)"
+      />
+    </div>
+    <div class="residentsList" v-else>
+      <Resident :resident="{id: 0, fio: 'Дачники отсутствуют',area: 0, start_date:'2000-01-01'}"
+                :payment="0"
+      />
     </div>
     <div class="residentsList__footer">
       <span>Общая площадь: {{ calculateArea }} м²</span>
@@ -28,9 +37,6 @@ export default {
   props: {
     residents: {
       type: Array,
-    },
-    dateForFilter: {
-      type: Date,
     },
     revenue: {
       type: Number
